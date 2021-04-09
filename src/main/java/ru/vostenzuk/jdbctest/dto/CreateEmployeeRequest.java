@@ -11,12 +11,6 @@ public class CreateEmployeeRequest {
     @NotNull
     private String position;
 
-    public CreateEmployeeRequest(String firstName, String lastName, String position) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.position = position;
-    }
-
     public String getFirstName() {
         return firstName;
     }

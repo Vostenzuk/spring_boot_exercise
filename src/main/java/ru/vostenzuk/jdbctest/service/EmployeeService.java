@@ -2,15 +2,16 @@ package ru.vostenzuk.jdbctest.service;
 
 import org.springframework.stereotype.Service;
 import ru.vostenzuk.jdbctest.domain.EmployeeEntity;
-import ru.vostenzuk.jdbctest.domain.ItemEntity;
 import ru.vostenzuk.jdbctest.dto.CreateEmployeeRequest;
 import ru.vostenzuk.jdbctest.dto.ExpenseDto;
+import ru.vostenzuk.jdbctest.dto.UpdateEmployeeRequest;
 import ru.vostenzuk.jdbctest.mapper.EmployeeMapper;
 import ru.vostenzuk.jdbctest.repository.EmployeeRepository;
 import ru.vostenzuk.jdbctest.repository.ItemRepository;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -20,10 +21,10 @@ public class EmployeeService {
     private final EmployeeMapper mapper;
     private final ItemRepository itemRepository;
 
-    public EmployeeService(EmployeeRepository repository, ItemRepository itemRepository, EmployeeMapper mapper, ItemRepository itemRepository1) {
+    public EmployeeService(EmployeeRepository repository, ItemRepository itemRepository, EmployeeMapper mapper) {
         this.repository = repository;
         this.mapper = mapper;
-        this.itemRepository = itemRepository1;
+        this.itemRepository = itemRepository;
     }
 
     public List<EmployeeEntity> getAllEmployees() {
@@ -55,26 +56,35 @@ public class EmployeeService {
         return new ExpenseDto(employee.countExpenses());
     }
 
-    public EmployeeEntity addItem(UUID employeeId, UUID itemId) {
+    public EmployeeEntity updateEmployee(UUID employeeId, UpdateEmployeeRequest request) {
         EmployeeEntity employee = repository.findById(employeeId).orElseThrow(() ->
                 new EntityNotFoundException(String.format("Employee with id %s is not found", employeeId)));
-        ItemEntity item = itemRepository.findById(itemId).orElseThrow(() ->
-                new EntityNotFoundException(String.format("Item with id %s is not found", itemId)));
 
-        employee.getItems().add(item);
+        if (fieldNeedsUpdating(request.getFirstName())) {
+            employee.setFirstName(request.getFirstName());
+        }
+        if (fieldNeedsUpdating(request.getLastName())) {
+            employee.setLastName(request.getLastName());
+        }
+        if (fieldNeedsUpdating(request.getPosition())) {
+            employee.setPosition(request.getPosition());
+        }
+        if (fieldNeedsUpdating(request.getAddItems())) {
+            request.getAddItems().forEach(id -> employee.getItems().add(itemRepository.findById(id).orElseThrow(() ->
+                    new EntityNotFoundException(String.format("Item with id %s is not found", id)))));
+        }
+        if (fieldNeedsUpdating(request.getRemoveItems())) {
+            request.getRemoveItems().forEach(id -> employee.getItems().remove(itemRepository.findById(id).orElseThrow(() ->
+                    new EntityNotFoundException(String.format("Item with id %s is not found", id)))));
+        }
         try {
             return repository.save(employee);
         } catch (Exception ex) {
-            throw new IllegalArgumentException(String.format("Item with id %s belongs to another employee", item.getId()));
+            throw new IllegalArgumentException(String.format("Can't save items %s, they belong to another employee", request.getAddItems()));
         }
     }
 
-    public EmployeeEntity removeItem(UUID employeeId, UUID itemId) {
-        EmployeeEntity employee = repository.findById(employeeId).orElseThrow(
-                () -> new EntityNotFoundException(String.format("Employee with id %s is not found", employeeId)));
-        ItemEntity item = itemRepository.findById(itemId).orElseThrow(
-                () -> new EntityNotFoundException(String.format("Item with id %s is not found", itemId)));
-        employee.getItems().remove(item);
-        return repository.save(employee);
+    private <T> boolean fieldNeedsUpdating(T value) {
+        return !Objects.isNull(value) && !Objects.equals(value, "string");
     }
 }
