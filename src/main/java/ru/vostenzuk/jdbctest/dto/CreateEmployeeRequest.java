@@ -11,6 +11,21 @@ public class CreateEmployeeRequest {
     @NotNull
     private String position;
 
+    private CreateEmployeeRequest(Builder builder) {
+        this.firstName = builder.firstName;
+        this.lastName = builder.lastName;
+        this.position = builder.position;
+    }
+
+    public CreateEmployeeRequest(String firstName, String lastName, String position) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.position = position;
+    }
+
+    public CreateEmployeeRequest() {
+    }
+
     public String getFirstName() {
         return firstName;
     }
@@ -42,5 +57,31 @@ public class CreateEmployeeRequest {
                 ", lastname='" + lastName + '\'' +
                 ", position='" + position + '\'' +
                 '}';
+    }
+
+    public static class Builder {
+
+        private String firstName;
+        private String lastName;
+        private String position;
+
+        public Builder() {}
+
+        public Builder firstName(String firstName) {
+            this.firstName = firstName;
+            return this;
+        }
+        public Builder lastName(String lastName) {
+            this.lastName = lastName;
+            return this;
+        }
+        public Builder position(String position) {
+            this.position = position;
+            return this;
+        }
+
+        public CreateEmployeeRequest build() {
+            return new CreateEmployeeRequest(this);
+        }
     }
 }
