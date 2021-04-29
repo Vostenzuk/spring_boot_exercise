@@ -4,7 +4,9 @@ import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import ru.vostenzuk.jdbctest.domain.ItemEntity;
-import ru.vostenzuk.jdbctest.dto.CreateItemRequest;
+import ru.vostenzuk.jdbctest.dto.item.CreateItemRequestDto;
+import ru.vostenzuk.jdbctest.dto.item.ItemDto;
+import ru.vostenzuk.jdbctest.dto.item.ItemUpdateRequestDto;
 
 @Mapper(
         componentModel = "spring",
@@ -13,5 +15,11 @@ import ru.vostenzuk.jdbctest.dto.CreateItemRequest;
 )
 public interface ItemMapper {
 
-    ItemEntity fromRequest(CreateItemRequest request);
+    ItemEntity toEntity(ItemEntity request);
+
+    ItemEntity toEntity(ItemUpdateRequestDto requestDto);
+
+    ItemDto fromEntity(ItemEntity itemEntity);
+
+    ItemEntity toEntity(CreateItemRequestDto request);
 }

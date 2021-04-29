@@ -5,7 +5,6 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
-import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -77,14 +76,6 @@ public class EmployeeEntity {
 
     public void setItems(Set<ItemEntity> items) {
         this.items = items;
-    }
-
-    public BigDecimal countExpenses() {
-        BigDecimal sum = BigDecimal.ZERO;
-        for (ItemEntity item : items) {
-            sum = sum.add(item.getPrice());
-        }
-        return sum;
     }
 
     @Override

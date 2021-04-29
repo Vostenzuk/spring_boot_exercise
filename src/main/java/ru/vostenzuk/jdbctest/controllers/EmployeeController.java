@@ -1,54 +1,47 @@
 package ru.vostenzuk.jdbctest.controllers;
 
-import io.swagger.v3.oas.annotations.Operation;
+import java.util.stream.Collectors;
 import org.springframework.web.bind.annotation.*;
-import ru.vostenzuk.jdbctest.domain.EmployeeEntity;
-import ru.vostenzuk.jdbctest.dto.CreateEmployeeRequest;
-import ru.vostenzuk.jdbctest.dto.ExpenseDto;
-import ru.vostenzuk.jdbctest.dto.UpdateEmployeeRequest;
+import ru.vostenzuk.jdbctest.dto.employee.EmployeeDto;
+import ru.vostenzuk.jdbctest.dto.employee.EmployeeRequestDto;
+import ru.vostenzuk.jdbctest.mapper.EmployeeMapper;
 import ru.vostenzuk.jdbctest.service.EmployeeService;
 
 import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/employees")
-public class EmployeeController {
+public class EmployeeController implements EmployeeOperations {
 
-    private final EmployeeService employeeService;
+  private final EmployeeService employeeService;
+  private final EmployeeMapper mapper;
 
-    public EmployeeController(EmployeeService employeeService) {
-        this.employeeService = employeeService;
-    }
+  public EmployeeController(EmployeeService employeeService,
+      EmployeeMapper mapper) {
+    this.employeeService = employeeService;
+    this.mapper = mapper;
+  }
 
-    @Operation(summary = "Получить список всех сотрудников")
-    @GetMapping
-    public List<EmployeeEntity> getEmployees() {
-        return employeeService.getAllEmployees();
-    }
+  @Override
+  public List<EmployeeDto> getEmployees() {
+    return employeeService.getAllEmployees().stream().map(mapper::fromEntity).collect(
+        Collectors.toList());
+  }
 
-    @Operation(summary = "Получить данные о сотруднике")
-    @GetMapping("/{id}")
-    public EmployeeEntity getEmployee(@PathVariable("id") UUID id) {
-        return employeeService.getEmployee(id);
-    }
+  @Override
+  public EmployeeDto getEmployee(@PathVariable("id") UUID id) {
+    return mapper.fromEntity(employeeService.getEmployee(id));
+  }
 
-    @Operation(summary = "Создать сотрудника")
-    @PostMapping
-    public EmployeeEntity createEmployee(@RequestBody CreateEmployeeRequest employeeRequest) {
-        return employeeService.createEmployee(employeeRequest);
-    }
+  @Override
+  public EmployeeDto createEmployee(@RequestBody EmployeeRequestDto employeeRequest) {
+    return mapper.fromEntity(employeeService.createEmployee(mapper.fromRequest(employeeRequest)));
+  }
 
-    @Operation(summary = "Получить траты на сотрудника")
-    @GetMapping("/{id}/expense")
-    public ExpenseDto countExpenses(@PathVariable("id") UUID employeeId) {
-        return employeeService.getExpenses(employeeId);
-    }
-
-    @Operation(summary = "Обновить данные сотрудника, добавить/удалить предметы")
-    @PatchMapping("/{id}")
-    public EmployeeEntity addItem(@PathVariable("id") UUID employeeId,
-                                  @RequestBody UpdateEmployeeRequest updateEmployeeRequest) {
-        return employeeService.updateEmployee(employeeId, updateEmployeeRequest);
-    }
+  @Override
+  public EmployeeDto updateEmployee(@PathVariable("id") UUID employeeId,
+      @RequestBody EmployeeRequestDto employeeRequest) {
+    return mapper.fromEntity(
+        employeeService.updateEmployee(employeeId, mapper.fromRequest(employeeRequest)));
+  }
 }
