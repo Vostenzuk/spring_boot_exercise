@@ -1,11 +1,9 @@
 package ru.vostenzuk.jdbctest.controllers;
 
-import java.util.stream.Collectors;
 import org.springframework.web.bind.annotation.*;
 import ru.vostenzuk.jdbctest.dto.item.CreateItemRequestDto;
 import ru.vostenzuk.jdbctest.dto.item.ItemDto;
 import ru.vostenzuk.jdbctest.dto.item.ItemUpdateRequestDto;
-import ru.vostenzuk.jdbctest.mapper.ItemMapper;
 import ru.vostenzuk.jdbctest.service.ItemService;
 
 import java.util.List;
@@ -15,31 +13,28 @@ import java.util.UUID;
 public class ItemController implements ItemOperations {
 
   private final ItemService service;
-  private final ItemMapper mapper;
 
-  public ItemController(ItemService service, ItemMapper mapper) {
+  public ItemController(ItemService service) {
     this.service = service;
-    this.mapper = mapper;
   }
-
 
   @Override
   public List<ItemDto> getAllItems() {
-    return service.getAllItems().stream().map(mapper::fromEntity).collect(Collectors.toList());
+    return service.getAllItems();
   }
 
   @Override
   public ItemDto getItem(UUID id) {
-    return mapper.fromEntity(service.getItem(id));
+    return service.getItem(id);
   }
 
   @Override
   public ItemDto createItem(CreateItemRequestDto request) {
-    return mapper.fromEntity(service.createItem(mapper.toEntity(request)));
+    return service.createItem(request);
   }
 
   @Override
   public ItemDto updateItem(UUID id, ItemUpdateRequestDto request) {
-    return mapper.fromEntity(service.updateItem(id, mapper.toEntity(request)));
+    return service.updateItem(id, request);
   }
 }

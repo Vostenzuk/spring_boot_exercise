@@ -1,9 +1,8 @@
 package ru.vostenzuk.jdbctest.dto.item;
 
-import com.sun.istack.NotNull;
-
 import java.math.BigDecimal;
 import java.util.Objects;
+import javax.validation.constraints.NotNull;
 
 public class CreateItemRequestDto extends ItemUpdateRequestDto {
 
@@ -19,13 +18,12 @@ public class CreateItemRequestDto extends ItemUpdateRequestDto {
   }
 
   @Override
-  public BigDecimal getPrice() {
-    return super.getPrice();
-  }
-
-  @Override
   public void setPrice(BigDecimal price) {
     super.setPrice(price);
+  }
+
+  public static Builder builder() {
+    return new Builder();
   }
 
   @Override
@@ -54,5 +52,28 @@ public class CreateItemRequestDto extends ItemUpdateRequestDto {
         "type='" + type + '\'' +
         ", price=" + super.getPrice() +
         '}';
+  }
+
+  public static class Builder {
+
+    private final CreateItemRequestDto requestDto;
+
+    public Builder() {
+      requestDto = new CreateItemRequestDto();
+    }
+
+    public Builder type(String type) {
+      this.requestDto.setType(type);
+      return this;
+    }
+
+    public Builder price(BigDecimal price) {
+      this.requestDto.setPrice(price);
+      return this;
+    }
+
+    public CreateItemRequestDto build() {
+      return this.requestDto;
+    }
   }
 }

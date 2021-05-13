@@ -11,12 +11,6 @@ public class EmployeeRequestDto {
   @NotNull
   private String position;
 
-  private EmployeeRequestDto(Builder builder) {
-    this.firstName = builder.firstName;
-    this.lastName = builder.lastName;
-    this.position = builder.position;
-  }
-
   public String getFirstName() {
     return firstName;
   }
@@ -41,6 +35,10 @@ public class EmployeeRequestDto {
     this.position = position;
   }
 
+  public static Builder builder() {
+    return new Builder();
+  }
+
   @Override
   public String toString() {
     return "CreateEmployeeRequest{" +
@@ -52,30 +50,29 @@ public class EmployeeRequestDto {
 
   public static class Builder {
 
-    private String firstName;
-    private String lastName;
-    private String position;
+    private final EmployeeRequestDto employeeRequestDto;
 
     public Builder() {
+      this.employeeRequestDto = new EmployeeRequestDto();
     }
 
     public Builder firstName(String firstName) {
-      this.firstName = firstName;
+      this.employeeRequestDto.setFirstName(firstName);
       return this;
     }
 
     public Builder lastName(String lastName) {
-      this.lastName = lastName;
+      this.employeeRequestDto.setLastName(lastName);
       return this;
     }
 
     public Builder position(String position) {
-      this.position = position;
+      this.employeeRequestDto.setPosition(position);
       return this;
     }
 
     public EmployeeRequestDto build() {
-      return new EmployeeRequestDto(this);
+      return this.employeeRequestDto;
     }
   }
 }

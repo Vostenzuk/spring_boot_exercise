@@ -14,7 +14,8 @@ import ru.vostenzuk.jdbctest.dto.employee.EmployeeDto;
 )
 public interface EmployeeMapper {
 
-    EmployeeEntity fromRequest(EmployeeRequestDto request);
+    EmployeeEntity toEntity(EmployeeRequestDto request);
+    EmployeeEntity toEntity(EmployeeDto employeeDto);
 
     EmployeeDto fromEntity(EmployeeEntity employeeEntity);
 }

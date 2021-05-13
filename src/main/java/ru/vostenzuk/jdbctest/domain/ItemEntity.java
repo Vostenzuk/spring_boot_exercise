@@ -10,7 +10,6 @@ import javax.persistence.Id;
 import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.UUID;
-import org.hibernate.cache.spi.support.AbstractReadWriteAccess.Item;
 
 @Entity(name = "item")
 public class ItemEntity {

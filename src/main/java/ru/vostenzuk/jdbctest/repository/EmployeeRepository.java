@@ -1,6 +1,7 @@
 package ru.vostenzuk.jdbctest.repository;
 
 import java.util.Optional;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -14,6 +15,9 @@ public interface EmployeeRepository extends JpaRepository<EmployeeEntity, UUID> 
 
   boolean existsEmployeeEntitiesByLastNameAndFirstNameAndPosition(String lastName, String firstName,
       String position);
+
+  @EntityGraph("employee_items_graph")
+  Optional<EmployeeEntity> findById(UUID id);
 
   @Query(value = "select * from employee where id = (select ei.employee_id from employee_item ei where item_id = :itemId)",
       nativeQuery = true)

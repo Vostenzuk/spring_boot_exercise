@@ -1,9 +1,13 @@
 package ru.vostenzuk.jdbctest.service;
 
 import java.util.Optional;
+import java.util.stream.Collectors;
 import javax.validation.ConstraintViolationException;
 import org.springframework.stereotype.Service;
 import ru.vostenzuk.jdbctest.domain.EmployeeEntity;
+import ru.vostenzuk.jdbctest.dto.employee.EmployeeDto;
+import ru.vostenzuk.jdbctest.dto.employee.EmployeeRequestDto;
+import ru.vostenzuk.jdbctest.mapper.EmployeeMapper;
 import ru.vostenzuk.jdbctest.repository.EmployeeRepository;
 
 import javax.persistence.EntityNotFoundException;
@@ -15,39 +19,42 @@ import java.util.UUID;
 public class EmployeeServiceImpl implements EmployeeService {
 
   private final EmployeeRepository repository;
+  private final EmployeeMapper mapper;
 
-  public EmployeeServiceImpl(EmployeeRepository repository) {
+  public EmployeeServiceImpl(EmployeeRepository repository,
+      EmployeeMapper mapper) {
     this.repository = repository;
+    this.mapper = mapper;
   }
 
   @Override
-  public List<EmployeeEntity> getAllEmployees() {
-    return repository.findAll();
+  public List<EmployeeDto> getAllEmployees() {
+    return repository.findAll().stream().map(mapper::fromEntity).collect(Collectors.toList());
   }
 
   @Override
-  public EmployeeEntity getEmployee(UUID id) {
-    return repository.findById(id).orElseThrow(() ->
+  public EmployeeDto getEmployee(UUID id) {
+    return repository.findById(id).map(mapper::fromEntity).orElseThrow(() ->
         new EntityNotFoundException(String.format("Employee with id %s is not found", id)));
 
   }
 
   @Override
-  public EmployeeEntity createEmployee(EmployeeEntity employeeEntity) {
+  public EmployeeDto createEmployee(EmployeeRequestDto request) {
 
     if (repository.existsEmployeeEntitiesByLastNameAndFirstNameAndPosition(
-        employeeEntity.getLastName(),
-        employeeEntity.getFirstName(),
-        employeeEntity.getPosition()
+        request.getLastName(),
+        request.getFirstName(),
+        request.getPosition()
     )) {
-      throw new IllegalArgumentException("User with those credentials already exists");
+      throw new IllegalArgumentException("Employee with those credentials already exists");
     } else {
-      return repository.save(employeeEntity);
+      return mapper.fromEntity(repository.save(mapper.toEntity(request)));
     }
   }
 
   @Override
-  public EmployeeEntity updateEmployee(UUID employeeId, EmployeeEntity request) {
+  public EmployeeDto updateEmployee(UUID employeeId, EmployeeRequestDto request) {
     EmployeeEntity employee = repository.findById(employeeId).orElseThrow(() ->
         new EntityNotFoundException(String.format("Employee with id %s is not found", employeeId)));
 
@@ -61,17 +68,17 @@ public class EmployeeServiceImpl implements EmployeeService {
       employee.setPosition(request.getPosition());
     }
 
-    return repository.save(employee);
+    return mapper.fromEntity(repository.save(employee));
   }
 
   @Override
-  public void persist(EmployeeEntity employeeEntity) throws ConstraintViolationException {
-    repository.save(employeeEntity);
+  public void persist(EmployeeDto employeeDto) throws ConstraintViolationException {
+    repository.save(mapper.toEntity(employeeDto));
   }
 
   @Override
-  public Optional<EmployeeEntity> findByItemId(UUID itemId) {
-    return repository.findEmployeeEntityByItemId(itemId.toString());
+  public Optional<EmployeeDto> findByItemId(UUID itemId) {
+    return repository.findEmployeeEntityByItemId(itemId.toString()).map(mapper::fromEntity);
   }
 
   private <T> boolean fieldNeedsUpdating(T value) {

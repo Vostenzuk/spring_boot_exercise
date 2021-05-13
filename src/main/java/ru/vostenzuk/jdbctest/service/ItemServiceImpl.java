@@ -5,6 +5,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import ru.vostenzuk.jdbctest.domain.ItemEntity;
+import ru.vostenzuk.jdbctest.dto.item.CreateItemRequestDto;
+import ru.vostenzuk.jdbctest.dto.item.ItemDto;
+import ru.vostenzuk.jdbctest.dto.item.ItemUpdateRequestDto;
 import ru.vostenzuk.jdbctest.mapper.ItemMapper;
 import ru.vostenzuk.jdbctest.repository.ItemRepository;
 
@@ -16,18 +19,20 @@ import java.util.UUID;
 public class ItemServiceImpl implements ItemService {
 
   private final ItemRepository repository;
+  private final ItemMapper mapper;
 
-  public ItemServiceImpl(ItemRepository repository) {
+  public ItemServiceImpl(ItemRepository repository, ItemMapper mapper) {
     this.repository = repository;
+    this.mapper = mapper;
   }
 
   @Override
-  public List<ItemEntity> getAllItems() {
-    return repository.findAll();
+  public List<ItemDto> getAllItems() {
+    return repository.findAll().stream().map(mapper::fromEntity).collect(Collectors.toList());
   }
 
   @Override
-  public Set<ItemEntity> getAllByIds(Set<UUID> ids) {
+  public Set<ItemDto> getAllByIds(Set<UUID> ids) {
     Set<ItemEntity> foundItems = new HashSet<>(repository.findAllById(ids));
     if (foundItems.size() != ids.size()) {
       Set<UUID> foundItemIds = foundItems.stream().map(ItemEntity::getId)
@@ -35,25 +40,25 @@ public class ItemServiceImpl implements ItemService {
       ids.removeAll(foundItemIds);
       throw new EntityNotFoundException("Items with ids " + ids + " are not found!");
     }
-    return foundItems;
+    return foundItems.stream().map(mapper::fromEntity).collect(Collectors.toSet());
   }
 
   @Override
-  public ItemEntity getItem(UUID id) {
-    return repository.findById(id).orElseThrow(() ->
+  public ItemDto getItem(UUID id) {
+    return repository.findById(id).map(mapper::fromEntity).orElseThrow(() ->
         new EntityNotFoundException(String.format("Item with id %s is not found", id)));
   }
 
   @Override
-  public ItemEntity createItem(ItemEntity itemEntity) {
-    return repository.save(itemEntity);
+  public ItemDto createItem(CreateItemRequestDto request) {
+    return mapper.fromEntity(repository.save(mapper.toEntity(request)));
   }
 
   @Override
-  public ItemEntity updateItem(UUID id, ItemEntity itemEntity) {
+  public ItemDto updateItem(UUID id, ItemUpdateRequestDto request) {
     ItemEntity item = repository.findById(id).orElseThrow(() ->
         new EntityNotFoundException(String.format("Item with id %s is not found", id)));
-    item.setPrice(itemEntity.getPrice());
-    return repository.save(item);
+    item.setPrice(request.getPrice());
+    return mapper.fromEntity(repository.save(item));
   }
 }

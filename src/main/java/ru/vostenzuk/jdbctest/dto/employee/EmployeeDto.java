@@ -1,7 +1,10 @@
 package ru.vostenzuk.jdbctest.dto.employee;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import ru.vostenzuk.jdbctest.dto.item.ItemDto;
 
 public class EmployeeDto {
@@ -11,7 +14,7 @@ public class EmployeeDto {
   private String lastName;
   private String position;
 
-  private Set<ItemDto> items;
+  private Set<ItemDto> items = new HashSet<>();
 
   public UUID getId() {
     return id;
@@ -53,6 +56,34 @@ public class EmployeeDto {
     this.items = items;
   }
 
+  public static Builder builder() {
+    return new Builder();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    EmployeeDto that = (EmployeeDto) o;
+
+    return new EqualsBuilder().append(id, that.id)
+        .append(firstName, that.firstName).append(lastName, that.lastName)
+        .append(position, that.position).append(items, that.items).isEquals();
+  }
+
+  @Override
+  public int hashCode() {
+    return new HashCodeBuilder(17, 37).append(id).append(firstName).append(lastName)
+        .append(position)
+        .append(items).toHashCode();
+  }
+
   @Override
   public String toString() {
     return "Employee{" + "id=" + id
@@ -61,5 +92,43 @@ public class EmployeeDto {
         + ", position='" + position + '\''
         + ", items=" + items
         + '}';
+  }
+
+  public static class Builder {
+
+    private final EmployeeDto employeeDto;
+
+    public Builder() {
+      this.employeeDto = new EmployeeDto();
+    }
+
+    public Builder id(UUID id) {
+      this.employeeDto.setId(id);
+      return this;
+    }
+
+    public Builder firstName(String firstName) {
+      this.employeeDto.setFirstName(firstName);
+      return this;
+    }
+
+    public Builder lastName(String lastName) {
+      this.employeeDto.setLastName(lastName);
+      return this;
+    }
+
+    public Builder position(String position) {
+      this.employeeDto.setPosition(position);
+      return this;
+    }
+
+    public Builder items(Set<ItemDto> items) {
+      this.employeeDto.setItems(items);
+      return this;
+    }
+
+    public EmployeeDto build() {
+      return this.employeeDto;
+    }
   }
 }

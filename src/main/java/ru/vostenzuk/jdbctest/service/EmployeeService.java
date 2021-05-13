@@ -4,19 +4,20 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import javax.validation.ConstraintViolationException;
-import ru.vostenzuk.jdbctest.domain.EmployeeEntity;
+import ru.vostenzuk.jdbctest.dto.employee.EmployeeDto;
+import ru.vostenzuk.jdbctest.dto.employee.EmployeeRequestDto;
 
 public interface EmployeeService {
 
-  List<EmployeeEntity> getAllEmployees();
+  List<EmployeeDto> getAllEmployees();
 
-  EmployeeEntity getEmployee(UUID id);
+  EmployeeDto getEmployee(UUID id);
 
-  EmployeeEntity createEmployee(EmployeeEntity employeeEntity);
+  EmployeeDto createEmployee(EmployeeRequestDto employeeRequestDto);
 
-  EmployeeEntity updateEmployee(UUID employeeId, EmployeeEntity employeeEntity);
+  EmployeeDto updateEmployee(UUID employeeId, EmployeeRequestDto employeeRequestDto);
 
-  void persist(EmployeeEntity employeeEntity) throws ConstraintViolationException;
+  void persist(EmployeeDto employeeDto) throws ConstraintViolationException;
 
-  Optional<EmployeeEntity> findByItemId(UUID itemId);
+  Optional<EmployeeDto> findByItemId(UUID itemId);
 }
