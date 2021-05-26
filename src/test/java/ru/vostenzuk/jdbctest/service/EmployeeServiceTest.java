@@ -39,7 +39,7 @@ class EmployeeServiceTest {
   private final List<EmployeeEntity> employeeEntities = new ArrayList<>();
 
   @BeforeEach
-  void setUp() {
+  public void setUp() {
     service = new EmployeeServiceImpl(repository, mapper);
     for (int i = 0; i < 3; i++) {
       employees.add(EmployeeDto.builder()
@@ -61,7 +61,7 @@ class EmployeeServiceTest {
 
   @Test
   @DisplayName("Получаем список всех сотрудников")
-  void getAllEmployees() {
+  public void givenEmployeesExist_whenGetAllEmployees_thenReturnAllEmployees() {
     when(repository.findAll()).thenReturn(employeeEntities);
     when(mapper.fromEntity(any(EmployeeEntity.class)))
         .thenReturn(employees.get(0), employees.get(1), employees.get(2));
@@ -73,7 +73,7 @@ class EmployeeServiceTest {
 
   @Test
   @DisplayName("Получаем данные о сотруднике")
-  void getEmployee() {
+  public void givenEmployeeExists_whenGetEmployeeById_thenReturnEmployee() {
     EmployeeDto employee = employees.get(0);
 
     when(repository.findById(employee.getId())).thenReturn(Optional.of(employeeEntities.get(0)));
@@ -86,7 +86,7 @@ class EmployeeServiceTest {
 
   @Test
   @DisplayName("Получаем данные по несуществующему id")
-  void getEmployeeByNonExistentId() {
+  public void givenEmployeeDoesntExist_whenGetEmployeeById_thenThrowEntityNotFound() {
     UUID id = UUID.randomUUID();
 
     when(repository.findById(id)).thenReturn(Optional.empty());
@@ -98,7 +98,7 @@ class EmployeeServiceTest {
 
   @Test
   @DisplayName("Создаём сотрудника")
-  void createEmployee() {
+  public void givenEmployeeDoesntExist_whenCreateEmployee_thenCreateAndReturnEmployee() {
     EmployeeEntity employeeEntity = employeeEntities.get(0);
     EmployeeRequestDto request = EmployeeRequestDto.builder()
         .firstName(employeeEntity.getFirstName()).lastName(employeeEntity.getLastName())
@@ -117,7 +117,7 @@ class EmployeeServiceTest {
 
   @Test
   @DisplayName("Создаём уже существующего сотрудника")
-  void createEmployeeThatAlreadyExists() {
+  public void givenEmployeeExists_whenCreateEmployee_thenThrowIllegalArgument() {
     EmployeeEntity employeeEntity = employeeEntities.get(0);
     EmployeeRequestDto request = EmployeeRequestDto.builder()
         .firstName(employeeEntity.getFirstName())
@@ -135,7 +135,7 @@ class EmployeeServiceTest {
 
   @Test
   @DisplayName("Обновляем данные сотрудника")
-  void updateEmployee() {
+  public void givenEmployeeExist_whenUpdateEmployee_thenUpdateAndReturnEmployee() {
     EmployeeEntity employeeEntity = employeeEntities.get(0);
     UUID id = employeeEntity.getId();
     EmployeeRequestDto request = EmployeeRequestDto.builder()
@@ -159,7 +159,7 @@ class EmployeeServiceTest {
 
   @Test
   @DisplayName("Обновляем несуществующего сотрудника")
-  void updateEmployeeWithNonExistentId() {
+  public void givenEmployeeDoesntExist_whenUpdateEmployee_thenThrowEntityNotFound() {
     EmployeeDto employee = employees.get(0);
 
     when(repository.findById(employee.getId())).thenReturn(Optional.empty());
@@ -172,7 +172,7 @@ class EmployeeServiceTest {
 
   @Test
   @DisplayName("Сохраняем данные сотрудника")
-  void persist() {
+  public void givenEmployeeExists_whenPersistEmployee_thenPersistEmployee() {
 
     when(mapper.toEntity(employees.get(0))).thenReturn(employeeEntities.get(0));
     when(repository.save(employeeEntities.get(0))).thenThrow(ConstraintViolationException.class);
@@ -183,7 +183,7 @@ class EmployeeServiceTest {
 
   @Test
   @DisplayName("Находим сотрудника по id предмета")
-  void findByItemId() {
+  public void givenEmployeeExistsAndHasItem_whenFindByItem_thenReturnEmployee() {
     EmployeeDto employee = employees.get(0);
     ItemDto item = ItemDto.builder().id(UUID.randomUUID()).type("type").price(BigDecimal.ZERO)
         .build();

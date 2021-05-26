@@ -39,7 +39,7 @@ class ResourceManagementServiceTest {
   private final Set<ItemDto> items = new HashSet<>();
 
   @BeforeEach
-  void setUp() {
+  public void setUp() {
     service = new ResourceManagementServiceImpl(employeeService, itemService);
 
     for (int i = 0; i < 2; i++) {
@@ -66,7 +66,7 @@ class ResourceManagementServiceTest {
 
   @Test
   @DisplayName("Считаем расходы на сотрудника по ID")
-  void countExpensesById() {
+  public void givenEmployeeHasItems_whenGetEmployeeExpenses_thenReturnExpenses() {
     EmployeeDto employee = employees.get(0);
     when(employeeService.getEmployee(employees.get(0).getId())).thenReturn(employee);
 
@@ -77,7 +77,7 @@ class ResourceManagementServiceTest {
 
   @Test
   @DisplayName("Добавляем предметы на сотрудника")
-  void updateEmployeeItemsAddItemsSuccess() {
+  public void givenItemIsNotBound_whenBindItemToEmployee_thenBindItemToEmployee() {
     ItemListUpdateDto request = new ItemListUpdateDto();
 
     request.setAddItems(items.stream().map(ItemDto::getId).collect(
@@ -96,7 +96,7 @@ class ResourceManagementServiceTest {
 
   @Test
   @DisplayName("Добавляем на сотрудника уже прикрепленный к другому предмет")
-  void updateEmployeeItemsAddItemsOfAnotherEmployee() {
+  public void givenItemIsBoundToEmployee_whenBindItemToAnotherEmployee_thenThrowIllegalArgument() {
     ItemListUpdateDto request = new ItemListUpdateDto();
     EmployeeDto employeeWithItems = employees.get(0);
     employeeWithItems.setItems(items);
@@ -123,7 +123,7 @@ class ResourceManagementServiceTest {
 
   @Test
   @DisplayName("Удаляем предметы")
-  void removeItems() {
+  public void whenUnbindItemsFromEmployee_thenUnbindItem() {
     ItemListUpdateDto request = new ItemListUpdateDto();
     request.setRemoveItems(items.stream().map(ItemDto::getId).collect(Collectors.toSet()));
 

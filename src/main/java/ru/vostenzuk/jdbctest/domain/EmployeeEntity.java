@@ -106,17 +106,6 @@ public class EmployeeEntity {
     return Objects.hash(id, firstName, lastName, position, items);
   }
 
-  @Override
-  public String toString() {
-    return "Employee{" +
-        "id=" + id +
-        ", firstName='" + firstName + '\'' +
-        ", lastName='" + lastName + '\'' +
-        ", position='" + position + '\'' +
-        ", items=" + items +
-        '}';
-  }
-
   public static class Builder {
 
     private final EmployeeEntity employeeEntity;

@@ -38,7 +38,8 @@ public class ResourceManagementOperationsFunctionalTest extends AbstractRestFunc
 
   @Test
   @DisplayName("POSITIVE: Получаем расходы по сотруднику, у которого нет предметов")
-  public void getExpensesZeroPositiveTest() throws Exception {
+  public void givenEmployeeDoesntHaveItems_whenGetEmployeeExpenses_thenReturnZero()
+      throws Exception {
 
     EmployeeDto employee = employeeService
         .createEmployee(easyRandom.nextObject(EmployeeRequestDto.class));
@@ -46,12 +47,12 @@ public class ResourceManagementOperationsFunctionalTest extends AbstractRestFunc
     mockMvc.perform(get(BASE_URL + employee.getId() + "/expense"))
         .andExpect(status().isOk())
         .andDo(print())
-        .andExpect(jsonPath("$.amount", equalTo(BigDecimal.ZERO), BigDecimal.class));
+        .andExpect(jsonPath("$.amount").value(BigDecimal.ZERO));
   }
 
   @Test
   @DisplayName("POSITIVE: Получаем расходы по сотруднику, у которого есть предметы")
-  public void getExpensesTest() throws Exception {
+  public void givenEmployeeHasItems_whenGetEmployeeExpenses_thenReturnExpenses() throws Exception {
     EmployeeDto employeeDto = employeeService
         .createEmployee(easyRandom.nextObject(EmployeeRequestDto.class));
 
@@ -75,16 +76,14 @@ public class ResourceManagementOperationsFunctionalTest extends AbstractRestFunc
     mockMvc.perform(get(BASE_URL + employeeDto.getId() + "/expense"))
         .andDo(print())
         .andExpect(status().isOk())
-        .andExpect(
-            jsonPath("$.amount",
-                equalTo(item1.getPrice()
-                    .add(item2.getPrice())
-                    .doubleValue())));
+        .andExpect(jsonPath("$.amount")
+            .value(item1.getPrice().add(item2.getPrice()).doubleValue()));
   }
 
   @Test
   @DisplayName("Positive: Прицепляем к сотруднику один предмет")
-  public void addOneItemToEmployeeTest() throws Exception {
+  public void givenEmployeeExistsAndItemExist_whenBindItemToEmployee_thenBindAndReturnEmployeeWithItem()
+      throws Exception {
 
     EmployeeDto employee = employeeService
         .createEmployee(easyRandom.nextObject(EmployeeRequestDto.class));
@@ -107,7 +106,7 @@ public class ResourceManagementOperationsFunctionalTest extends AbstractRestFunc
 
   @Test
   @DisplayName("Positive: Удаляем предмет с сотрудника")
-  public void removeItemFromEmployeeTest() throws Exception {
+  public void givenEmployeeHasItem_whenUnbindItem_thenReturnEmployeeWithoutItem() throws Exception {
     EmployeeDto employeeDto = employeeService
         .createEmployee(easyRandom.nextObject(EmployeeRequestDto.class));
 
@@ -135,7 +134,8 @@ public class ResourceManagementOperationsFunctionalTest extends AbstractRestFunc
 
   @Test
   @DisplayName("NEGATIVE: Добавляем предмет, принадлежащий другому сотруднику")
-  public void updateEmployeeWithTakenItemTest() throws Exception {
+  public void givenItemBelongsToEmployee_whenBindItemToAnotherEmployee_thenReturnConflict()
+      throws Exception {
     EmployeeDto employeeWithItem = employeeService
         .createEmployee(easyRandom.nextObject(EmployeeRequestDto.class));
 

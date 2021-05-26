@@ -1,5 +1,6 @@
 package ru.vostenzuk.jdbctest.domain;
 
+import javax.persistence.Column;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
@@ -24,6 +25,7 @@ public class ItemEntity {
   @Type(type = "uuid-char")
   private UUID id;
   private String type;
+  @Column(scale = 2)
   private BigDecimal price;
 
   public UUID getId() {
@@ -70,15 +72,6 @@ public class ItemEntity {
   @Override
   public int hashCode() {
     return Objects.hash(id, type, price);
-  }
-
-  @Override
-  public String toString() {
-    return "Item{" +
-        "id=" + id +
-        ", type='" + type + '\'' +
-        ", price=" + price +
-        '}';
   }
 
   public static class Builder {

@@ -40,7 +40,7 @@ class ItemServiceTest {
   private Set<UUID> ids;
 
   @BeforeEach
-  void setUp() {
+  public void setUp() {
     service = new ItemServiceImpl(repository, mapper);
 
     for (int i = 0; i < 3; i++) {
@@ -53,7 +53,7 @@ class ItemServiceTest {
 
   @Test
   @DisplayName("Получаем все предметы из БД")
-  void getAllItemReturnsAllItems() {
+  public void givenItemsExist_whenGetAllItems_thenReturnAllItems() {
     when(repository.findAll()).thenReturn(itemEntities);
     when(mapper.fromEntity(any(ItemEntity.class)))
         .thenReturn(items.get(0), items.get(1), items.get(2));
@@ -64,7 +64,7 @@ class ItemServiceTest {
 
   @Test
   @DisplayName("Получаем все предметы по списку id")
-  void getAllByIdsTest() {
+  public void givenItemsExist_whenGetItemsByIds_thenReturnItems() {
 
     when(repository.findAllById(ids)).thenReturn(itemEntities.subList(0, 2));
     when(mapper.fromEntity(any(ItemEntity.class)))
@@ -78,7 +78,7 @@ class ItemServiceTest {
 
   @Test
   @DisplayName("Получаем предметы по списку несуществующих id")
-  void getAllByIdsWithNotExistentIds() {
+  public void givenItemsDontExist_whenGetItemsByIds_thenThrowEntityNotFound() {
     UUID fakeId = UUID.randomUUID();
     ids.add(fakeId);
     Set<UUID> existingAndNonExistingIds = ids;
@@ -92,7 +92,7 @@ class ItemServiceTest {
 
   @Test
   @DisplayName("Получаем данные о предмете по id")
-  void getExistingItem() {
+  public void givenItemExist_whenGetItemById_thenReturnItem() {
     ItemDto item = items.get(0);
 
     when(repository.findById(item.getId())).thenReturn(Optional.of(itemEntities.get(0)));
@@ -105,7 +105,7 @@ class ItemServiceTest {
 
   @Test
   @DisplayName("Получаем данные несуществующего предмета")
-  void getItemWithWrongItemId() {
+  public void givenItemDoesntExist_whenGetItemById_thenThrowEntityNotFound() {
     UUID id = UUID.randomUUID();
 
     when(repository.findById(id)).thenReturn(Optional.empty());
@@ -117,7 +117,7 @@ class ItemServiceTest {
 
   @Test
   @DisplayName("Обновляем данные о предмете")
-  void updateItem() {
+  public void givenItemExists_whenUpdateItem_thenUpdateAndReturnItem() {
     ItemUpdateRequestDto request = new ItemUpdateRequestDto();
     UUID id = items.get(0).getId();
     request.setPrice(BigDecimal.ONE);
@@ -138,7 +138,7 @@ class ItemServiceTest {
 
   @Test
   @DisplayName("Обновляем данные несуществующего предмета")
-  void updateItemWithNonExistentId() {
+  public void givenItemDoesntExist_whenUpdateItem_thenThrowEntityNotFound() {
     UUID id = UUID.randomUUID();
 
     when(repository.findById(id)).thenReturn(Optional.empty());
@@ -150,7 +150,7 @@ class ItemServiceTest {
 
   @Test
   @DisplayName("Создаём предмет")
-  void createItem() {
+  public void whenCreateItem_thenReturnCreatedItem() {
     ItemEntity itemEntity = itemEntities.get(0);
     CreateItemRequestDto request = CreateItemRequestDto.builder().type(itemEntity.getType())
         .price(itemEntity.getPrice()).build();
