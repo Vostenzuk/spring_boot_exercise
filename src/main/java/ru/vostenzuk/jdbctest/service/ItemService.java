@@ -1,45 +1,22 @@
 package ru.vostenzuk.jdbctest.service;
 
-import org.springframework.stereotype.Service;
-import ru.vostenzuk.jdbctest.domain.ItemEntity;
-import ru.vostenzuk.jdbctest.dto.CreateItemRequest;
-import ru.vostenzuk.jdbctest.dto.ItemUpdateRequest;
-import ru.vostenzuk.jdbctest.mapper.ItemMapper;
-import ru.vostenzuk.jdbctest.repository.ItemRepository;
-
-import javax.persistence.EntityNotFoundException;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import ru.vostenzuk.jdbctest.dto.item.CreateItemRequestDto;
+import ru.vostenzuk.jdbctest.dto.item.ItemDto;
+import ru.vostenzuk.jdbctest.dto.item.ItemUpdateRequestDto;
 
-@Service
-public class ItemService {
+public interface ItemService {
 
-    private final ItemRepository repository;
-    private final ItemMapper mapper;
+  List<ItemDto> getAllItems();
 
-    public ItemService(ItemRepository repository,
-                       ItemMapper mapper) {
-        this.repository = repository;
-        this.mapper = mapper;
-    }
+  Set<ItemDto> getAllByIds(Set<UUID> ids);
 
-    public List<ItemEntity> getAllItems() {
-        return repository.findAll();
-    }
+  ItemDto getItem(UUID id);
 
-    public ItemEntity getItem(UUID id) {
-        return repository.findById(id).orElseThrow(() ->
-                new EntityNotFoundException(String.format("Item with id %s is not found", id)));
-    }
+  ItemDto createItem(CreateItemRequestDto request);
 
-    public ItemEntity createItem(CreateItemRequest request) {
-        return repository.save(mapper.fromRequest(request));
-    }
+  ItemDto updateItem(UUID id, ItemUpdateRequestDto request);
 
-    public ItemEntity updateItem(UUID id, ItemUpdateRequest request) {
-        ItemEntity item = repository.findById(id).orElseThrow(() ->
-                new EntityNotFoundException(String.format("Item with id %s is not found", id)));
-        item.setPrice(request.getPrice());
-        return repository.save(item);
-    }
 }

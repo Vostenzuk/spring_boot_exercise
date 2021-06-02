@@ -1,46 +1,40 @@
 package ru.vostenzuk.jdbctest.controllers;
 
-import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.web.bind.annotation.*;
-import ru.vostenzuk.jdbctest.domain.ItemEntity;
-import ru.vostenzuk.jdbctest.dto.*;
+import ru.vostenzuk.jdbctest.dto.item.CreateItemRequestDto;
+import ru.vostenzuk.jdbctest.dto.item.ItemDto;
+import ru.vostenzuk.jdbctest.dto.item.ItemUpdateRequestDto;
 import ru.vostenzuk.jdbctest.service.ItemService;
 
 import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/items")
-public class ItemController {
+public class ItemController implements ItemOperations {
 
-    private final ItemService itemService;
+  private final ItemService service;
 
-    public ItemController(ItemService itemService) {
-        this.itemService = itemService;
-    }
+  public ItemController(ItemService service) {
+    this.service = service;
+  }
 
-    @Operation(summary = "Получить список всех предметов")
-    @GetMapping
-    public List<ItemEntity> getAllItems() {
-        return itemService.getAllItems();
-    }
+  @Override
+  public List<ItemDto> getAllItems() {
+    return service.getAllItems();
+  }
 
-    @Operation(summary = "Получить данные о предмете")
-    @GetMapping("/{id}")
-    public ItemEntity getItem(@PathVariable("id") UUID id) {
-        return itemService.getItem(id);
-    }
+  @Override
+  public ItemDto getItem(UUID id) {
+    return service.getItem(id);
+  }
 
-    @Operation(summary = "Создать предмет")
-    @PostMapping
-    public ItemEntity createItem(@RequestBody CreateItemRequest request) {
-        return itemService.createItem(request);
-    }
+  @Override
+  public ItemDto createItem(CreateItemRequestDto request) {
+    return service.createItem(request);
+  }
 
-    @Operation(summary = "Обновить данные о предмете")
-    @PatchMapping("/{id}")
-    public ItemEntity updateItem(@PathVariable("id") UUID id, @RequestBody ItemUpdateRequest request) {
-        return itemService.updateItem(id, request);
-    }
-
+  @Override
+  public ItemDto updateItem(UUID id, ItemUpdateRequestDto request) {
+    return service.updateItem(id, request);
+  }
 }

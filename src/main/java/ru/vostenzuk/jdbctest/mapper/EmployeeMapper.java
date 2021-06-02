@@ -4,7 +4,8 @@ import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import ru.vostenzuk.jdbctest.domain.EmployeeEntity;
-import ru.vostenzuk.jdbctest.dto.CreateEmployeeRequest;
+import ru.vostenzuk.jdbctest.dto.employee.EmployeeRequestDto;
+import ru.vostenzuk.jdbctest.dto.employee.EmployeeDto;
 
 @Mapper(
         componentModel = "spring",
@@ -13,5 +14,8 @@ import ru.vostenzuk.jdbctest.dto.CreateEmployeeRequest;
 )
 public interface EmployeeMapper {
 
-    EmployeeEntity fromRequest(CreateEmployeeRequest request);
+    EmployeeEntity toEntity(EmployeeRequestDto request);
+    EmployeeEntity toEntity(EmployeeDto employeeDto);
+
+    EmployeeDto fromEntity(EmployeeEntity employeeEntity);
 }
